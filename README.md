@@ -10,7 +10,7 @@ This repository holds the official Jekyll version of the Clean Blog theme on Sta
 
 **[View Live Preview](http://blackrockdigital.github.io/startbootstrap-clean-blog-jekyll/)**
 
-## Installation & Setup
+## Installation & Setup 
 
 ### Using RubyGems:
 

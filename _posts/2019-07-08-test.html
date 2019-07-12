@@ -28,7 +28,8 @@ background: '/img/posts/sql-bg.jpg'
 
 <p>A packet sniffer was used to capture the packets between the endpoints whilst the site was being browsed. Whilst this scenarios may seem artificial it is perfectly possible that a malicious user or code could access network traffic given time, skills and unpatched vulnerabilities. 
 The capture below was performed using Wireshark (https://www.wireshark.org/). Microsoft Netmon could also be used (http://www.microsoft.com/en-gb/download/details.aspx?id=4865). It shows traffic between the SQL server and the SharePoint server using the standard SQL port 1433.</p>
- 
+
+<img class="img-fluid" src="/img/posts/sqlencrypt/packet capture - list data.png" alt="Packet Capture">
 
 <p>Once the capture had completed a search was executed for the list item text. The text was easily located. The system makes no attempt to obfuscate the data let alone encrypt it.
 So how do we fix this? How do we configure encryption for SQL server connections? For this lab environment it is pretty straightforward. We need a server authentication certificate that matches the FQDN of the SQL server. For the purposes of this test I generated a self signed certificate in IIS (there are other methods of generating self-signed certificates). In the real world of course you will need to buy a proper certificate rather than use a self signed one. 
@@ -38,36 +39,39 @@ In IIS Manager (for this test you need to do that on the SQL server – so you m
 
 2. Enter a Friendly name and click OK.</p>
  
-
+<img class="img-fluid" src="/img/posts/sqlencrypt/self signed cert.png" alt="Cert">
 
 <p>The certificate as listed in IIS. Note it matches the FQDN of the SQL server.</p>
  
-
+<img class="img-fluid" src="/img/posts/sqlencrypt/cert info.png" alt="Cert Info">
 
 <p>3. In SQL Server Configuration Manager right click ‘Protocols for MSSQLServer’ under ‘SQL Server Network Configuration’.</p>
  
-
+<img class="img-fluid" src="/img/posts/sqlencrypt/SQL server config1.png" alt="Cert Info">
 
 <p>4. In the Certificate tab select the certificate you created earlier:</p>
  
-
+<img class="img-fluid" src="/img/posts/sqlencrypt/protocols for SQL.png" alt="Protocols for SQL">
 
 <p>5. In the Flags tab select ‘Force Encryption’ = Yes and Click OK.
 6. Restart the SQL server service.
 If the service fails to start  (you may see an error in the Services console) then you may need to give the SQL service account permissions to read the private key of the certificate. Proceed as follows.
 In the Certificates console navigate to the new certificate under the ‘Personal’ store and click ‘Manage Private Keys’ from the All Tasks menu.</p>
 
+<img class="img-fluid" src="/img/posts/sqlencrypt/cert permissions.png" alt="Manage Private Keys">
+
 <p>Give the SQL service account read permissions to the private keys and click OK.</p>
  
+<img class="img-fluid" src="/img/posts/sqlencrypt/cert permissions2.png" alt="Cert Permissions">
 
 <p>Restart the SQL server service.
 SQL server should now be forcing clients to encrypt their connections. To test this try another packet capture. The first thing to notice is that there will be a lot of packets marked as ‘TLS Exchange’.</p>
  
-
+<img class="img-fluid" src="/img/posts/sqlencrypt/packet capture - TLS.png" alt="TLS Packets">
 
 <p>This is the encrypted traffic between SQL and the SharePoint server. Browsing to the same page as above and repeating the same search for the list item text yields:</p>
  
-
+<img class="img-fluid" src="/img/posts/sqlencrypt/encrypted traffic.png" alt="Encrypted Traffic">
 
 <p>The data is no longer visible in the packet stream. This is a simple scenario but it took less than 10 minutes to secure the SharePoint-SQL traffic stream. In more complex environments and production scenarios a robust and comprehensive plan would be required (as always) but the principals are simple and the execution straightforward.</p>
 
